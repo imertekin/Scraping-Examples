@@ -110,6 +110,7 @@ class T_Product:
             span=soup.find('h1',class_='pr-new-br').span.text
             self.marka=self.marka.replace(span,'')    
 
+        # ürün resim url
         #Product image urls
         if soup.find('img',class_='ph-gl-img'):
             self.img_url=soup.find('img',class_='ph-gl-img')['src']
