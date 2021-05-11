@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd
 
 
 class T_Product:
@@ -9,9 +10,21 @@ class T_Product:
         
         self.link='https://www.trendyol.com'
         self.kargo=False
-        self.first_prc=None
+        self.first_prc=''
         self.second_prc=''
         self.ProductDscPrice=''
+        self.data={
+                'Product_Name':[],
+                'Product_Brand':[],
+                'Product_Free_Shipping':[],
+                'Product_Org_Price':[],
+                'Product_Dsc_Price':[],
+                'Product_Cart_Price':[],
+                'Product_insize':[],
+                'Product_outsize':[],
+                'Product_Ratings':[],
+                'Product_img_url':[]
+            }
 
     def search(self,ara):
         self.url_list=[]
@@ -25,7 +38,6 @@ class T_Product:
             url=links.a.get('href')           
             self.url_list.append(url)
         
-    
 
 
     def ProductDetail(self,product):
@@ -33,6 +45,8 @@ class T_Product:
         # If Trendyol Link is entered, it replaces it with a space.
         product=product.replace('https://www.trendyol.com','')
         self.product_link=self.link+product
+        if self.url_list==[]:
+            self.url_list.append(self.product_link)
         print('Ürün Linki',self.product_link)
         
         #requests ve soup işlemleri
@@ -117,3 +131,46 @@ class T_Product:
             print('img_url',self.img_url)
         else:
             self.img_url=''
+
+
+    def CreateFrame(self):
+        
+        for i in self.url_list:
+           
+            self.data['Product_Name'].append(self.ProductName)
+            self.data['Product_Brand'].append(self.marka)
+            self.data['Product_Free_Shipping'].append(self.kargo)
+            self.data['Product_Org_Price'].append(self.first_prc)
+            self.data['Product_Dsc_Price'].append(self.second_prc)
+            self.data['Product_Cart_Price'].append(self.ProductDscPrice)
+            self.data['Product_insize'].append(self.inSize)
+            self.data['Product_outsize'].append(self.outSize)
+            self.data['Product_Ratings'].append(self.ProductRatings)
+            self.data['Product_img_url'].append(self.img_url)
+
+        self.df=pd.DataFrame(self.data)
+
+
+
+
+# Search bar Testing
+
+# test=T_Product()
+# test.search('Tişört')
+
+# After Searching, scraping for all urls
+
+# for i in test.url_list:
+#     test.ProductDetail(i)
+
+# scraping for Single Product
+
+# test.ProductDetail('https://www.trendyol.com/trendyolmilla/beyaz-kolsuz-basic-orme-t-shirt-twoss20ts0021-p-35503716?boutiqueId=568034&merchantId=968')
+
+
+# Create DataFrame from single or all products
+
+
+# test.CreateFrame()
+
+
