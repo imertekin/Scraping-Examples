@@ -1,3 +1,3 @@
 # Bs-Training
 
-test
+My aim in this repo is web scraping on various e-commerce sites
