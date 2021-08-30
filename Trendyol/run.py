@@ -35,6 +35,7 @@ keywords=['erkek','kadın','tişört','pantolon','ceket','çocuk','mutfak','bany
 
 exe=TrendyolData.Clean()
 
+# Run Function
 
 def add():
 
