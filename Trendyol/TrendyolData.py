@@ -1,6 +1,15 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from datetime import datetime, time
+
+
+
+
+
 
 
 class T_Product:
@@ -13,7 +22,12 @@ class T_Product:
         self.first_prc=''
         self.second_prc=''
         self.ProductDscPrice=''
+        self.Product_No=''
         self.data={
+                'Product_No':[],
+                'Product_BreadCrum':[],
+                'Product_MinCatagory':[],
+                'Add_date':[],
                 'Product_Name':[],
                 'Product_Brand':[],
                 'Product_Free_Shipping':[],
@@ -23,41 +37,87 @@ class T_Product:
                 'Product_insize':[],
                 'Product_outsize':[],
                 'Product_Ratings':[],
-                'Product_img_url':[]
+                'Product_url':[],
+                'Product_img_url':[],
+                
             }
 
-    def search(self,ara):
+    # Anahtar Kelime Arama 
+
+    def search(self,ara,i=1):
         self.url_list=[]
         self.ara=ara
-        search_link=self.link+'/sr?q='+self.ara
+
+        for j in range(0,i+1):
+            search_link=self.link+'/sr?q='+self.ara+'&pi='+str(j)
         
-        r=requests.get(search_link)
-        soup=BeautifulSoup(r.content,'html.parser')
-        soup.find_all('div',class_='p-card-wrppr')
-        for links in soup.find_all('div',class_='p-card-wrppr'):
-            url=links.a.get('href')           
-            self.url_list.append(url)
+            r=requests.get(search_link)
+            soup=BeautifulSoup(r.content,'html.parser')
+        
+            for links in soup.find_all('div',class_='p-card-wrppr'):
+                url=links.a.get('href')           
+                self.url_list.append(url)
         
 
+
+    #Sayfada ki ürünlerin bilgilerini parse etme
 
     def ProductDetail(self,product):
         #Trendyol Linki girilirse boşlukla değiştiriyor
         # If Trendyol Link is entered, it replaces it with a space.
+        
         product=product.replace('https://www.trendyol.com','')
         self.product_link=self.link+product
         if self.url_list==[]:
             self.url_list.append(self.product_link)
         print('Ürün Linki',self.product_link)
         
+        
         #requests ve soup işlemleri
         #requests and soup operations
         r=requests.get(self.product_link)
         soup=BeautifulSoup(r.content,'html.parser')
         
+
+        #Product_No
+
+        lhs,rhs=self.product_link.split('-p-',1)
+        if len(rhs.split('-p-',1))>1 :
+            rhs=rhs.split('-p-',1)[1]
+            self.Product_No=rhs.split('?')[0]
+            print("Product No : ",self.Product_No)
+        else:
+            self.Product_No=rhs.split('?')[0]
+            print("Product No : ",self.Product_No)
+
+
+
+        #Product BreadCrum
+        self.Product_BreadCrum=[]
+        if soup.find_all('div',class_='breadcrumb full-width'):
+            for i in soup.find_all('div',class_='breadcrumb full-width'):
+                for j in range(0,len(i.find_all('span'))):
+                    self.Product_BreadCrum.append(i.find_all('span')[j].text)
+            if soup.find('div',class_='pr-in-cn').a:
+                self.Product_BreadCrum=self.Product_BreadCrum[:-1]
+            print('Product_BreadCrum : ',self.Product_BreadCrum)
+
+        #En alt Kategori
+        if len(self.Product_BreadCrum)>0:
+            self.Product_MinCatagory=self.Product_BreadCrum[-1]
+            print('Product_MinCatagory : ', self.Product_MinCatagory)
+
+
         # Ürün İsmi
         #Product Name
         self.ProductName=soup.find('div',class_='pr-in-cn').span.text
         print(self.ProductName)
+
+
+        #EKlenme Tarihi
+        now=datetime.now()
+        self.now_str = now.strftime("%d/%m/%Y %H:%M:%S")
+        
 
         #Kargo Ücretsiz mi sorgusu
         # Free Shipping query
@@ -102,9 +162,10 @@ class T_Product:
        
         # ürün beden bilgisi
         # Product size
+        self.inSize=[]
+        self.outSize=[]
         if soup.find('div',class_='pr-in-at-sp'):
-            self.inSize=[]
-            self.outSize=[]
+            
             elemnt_size=soup.find('div',class_='pr-in-at-sp').find_all('div',class_='sp-itm')
             element_outSize=soup.find('div',class_='pr-in-at-sp').find_all('div',class_='so')
             for i in elemnt_size:
@@ -131,46 +192,77 @@ class T_Product:
             print('img_url',self.img_url)
         else:
             self.img_url=''
+        
+        
 
+
+
+     # DataFrame Oluşturma
 
     def CreateFrame(self):
         
-        for i in self.url_list:
-           
-            self.data['Product_Name'].append(self.ProductName)
-            self.data['Product_Brand'].append(self.marka)
-            self.data['Product_Free_Shipping'].append(self.kargo)
-            self.data['Product_Org_Price'].append(self.first_prc)
-            self.data['Product_Dsc_Price'].append(self.second_prc)
-            self.data['Product_Cart_Price'].append(self.ProductDscPrice)
-            self.data['Product_insize'].append(self.inSize)
-            self.data['Product_outsize'].append(self.outSize)
-            self.data['Product_Ratings'].append(self.ProductRatings)
-            self.data['Product_img_url'].append(self.img_url)
+        self.data['Product_No'].append(self.Product_No)
+        self.data['Add_date'].append(self.now_str) 
+        self.data['Product_Name'].append(self.ProductName)
+        self.data['Product_BreadCrum'].append(self.Product_BreadCrum)
+        self.data['Product_MinCatagory'].append(self.Product_MinCatagory)
+        self.data['Product_Brand'].append(self.marka)
+        self.data['Product_Free_Shipping'].append(self.kargo)
+        self.data['Product_Org_Price'].append(self.first_prc)
+        self.data['Product_Dsc_Price'].append(self.second_prc)
+        self.data['Product_Cart_Price'].append(self.ProductDscPrice)
+        self.data['Product_insize'].append(self.inSize)
+        self.data['Product_outsize'].append(self.outSize)
+        self.data['Product_Ratings'].append(self.ProductRatings)
+        self.data['Product_url'].append(self.product_link)
+        self.data['Product_img_url'].append(self.img_url)
 
         self.df=pd.DataFrame(self.data)
 
 
 
 
-# Search bar Testing
-
-# test=T_Product()
-# test.search('Tişört')
-
-# After Searching, scraping for all urls
-
-# for i in test.url_list:
-#     test.ProductDetail(i)
-
-# scraping for Single Product
-
-# test.ProductDetail('https://www.trendyol.com/trendyolmilla/beyaz-kolsuz-basic-orme-t-shirt-twoss20ts0021-p-35503716?boutiqueId=568034&merchantId=968')
+    def start(self):
+        for i in self.url_list:
+            self.ProductDetail(i)
+            self.CreateFrame()
+            self.first_prc=''
+            self.second_prc=''
+            self.ProductDscPrice=''
+            
 
 
-# Create DataFrame from single or all products
 
+class Clean:
+    
+    def __init__(self):
+        self.test=T_Product()
+        
+    def run(self,a,i=1):
 
-# test.CreateFrame()
+        try:   
+            self.test.search(a,i)
+            self.test.start()
+            self.data=self.test.df
+        except:
+            pass
+        
+    def clean_df(self):
 
-
+        for i in self.data.columns:
+            try:               
+                self.data[i] = self.data[i].apply(lambda y: np.nan if len(y)==0 else y)
+                if i=='Add_date':
+                    self.data[i]=self.data[i].astype(datetime)                                
+                if i!='Product_insize' and i!='Product_outsize' and i!='Product_BreadCrum' and i!='Add_date':
+                    self.data[i]=self.data[i].str.replace('.', '',regex=True)
+                    self.data[i]=self.data[i].replace(r'^\s*$', np.NaN, regex=True)
+                    self.data[i]=self.data[i].str.replace(' TL', '')    
+                    self.data[i]=self.data[i].str.replace(',', '.')
+                    self.data[i]=self.data[i].astype(float)
+            except:
+                pass
+                
+        
+        
+        
