@@ -19,7 +19,7 @@ pgcursor=pgconn.cursor()
 
 
 
-engine=create_engine('postgresql+psycopg2://postgres:1994Fikret@localhost/trendyol')
+engine=create_engine('postgresql+psycopg2://postgres:admin@localhost/trendyol')
 
 
 

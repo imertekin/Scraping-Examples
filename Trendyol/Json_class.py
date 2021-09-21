@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import pandas as pd
+import datetime
 
 class data_parser:
 
@@ -22,6 +23,7 @@ class data_parser:
         self.originalPrice=list()
         self.discountedPrice=list()
         self.freeCargo=list()
+        self.added_time=list()
 
 
     
@@ -41,14 +43,22 @@ class data_parser:
         self.data=self.data.replace(';window.slpName=\'\';window.TYPageName=\'product_search_result\';window.isSearchResult=true;window.pageType="search";</script>','')
 
         self.data=json.loads(self.data)
+        for i in range(0,len(self.data['products'])):
+            try:
+                self.id.append(self.data['products'][i]['id'])
+            except:
+                self.id.append(None)
 
-        for i in range(0,24):
-            self.id.append(self.data['products'][i]['id'])
             self.name.append(self.data['products'][i]['name'])
             self.images.append(self.data['products'][i]['images'][0])
             self.brand.append(self.data['products'][i]['brand']['name'])
-            self.ratingscore.append(self.data['products'][i]['ratingScore']['averageRating'])
-            self.totalcount.append(self.data['products'][i]['ratingScore']['totalCount'])
+            try:
+                self.ratingscore.append(self.data['products'][i]['ratingScore']['averageRating'])
+                self.totalcount.append(self.data['products'][i]['ratingScore']['totalCount'])
+            except:
+                self.ratingscore.append(None)
+                self.totalcount.append(None)
+
             self.categoryHierarchy.append(self.data['products'][i]['categoryHierarchy'])
             self.categoryId.append(self.data['products'][i]['categoryId'])
             self.categoryName.append(self.data['products'][i]['categoryName'])
@@ -57,15 +67,16 @@ class data_parser:
             self.originalPrice.append(self.data['products'][i]['price']['originalPrice'])
             self.discountedPrice.append(self.data['products'][i]['price']['discountedPrice'])
             self.freeCargo.append(self.data['products'][i]['freeCargo'])
+            self.added_time.append(str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")))
 
 
         self.product={
-            'id':self.id,
+            'P_id':self.id,
             'name':self.name,
             'images':self.images,
             'brand':self.brand,
-            'ratingscore':self.ratingscore,
-            'totalcount':self.totalcount,
+            'ratingScore':self.ratingscore,
+            'totalCount':self.totalcount,
             'categoryHierarchy':self.categoryHierarchy,
             'categoryId':self.categoryId,
             'categoryName':self.categoryName,
@@ -73,31 +84,21 @@ class data_parser:
             'sellingpPice':self.sellingPrice,
             'originalPrice':self.originalPrice,
             'discountedPrice':self.discountedPrice,
-            'freeCargo':self.freeCargo
+            'freeCargo':self.freeCargo,
+            'addedTime':self.added_time
         }
 
 
-    def run(self,key,i):
-        self.__init__()
+    def run(self,key,i=1):
+        
         for j in range(1,i+1):
             self.search(key,j)
+
+        self.data=pd.DataFrame.from_dict(self.product)
+        self.data['addedTime']=pd.to_datetime(self.data['addedTime'])
+        self.data['ratingScore']=self.data['ratingScore'].round(2)
 
 
 # k=data_parser()
 
-# k.search('tişört',2)
-
-# k.product
-
-# pp=pd.DataFrame.from_dict(k.product)
-
-# pp.info()
-
-# pp.head()
-
-# for i in range(1,3):
-#     k.search('tişört',i)
-
-# pp['ratingscore'].round(1)
-
-# k.run('tişört',2)
+# k.run('tişört')
