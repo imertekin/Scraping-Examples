@@ -12,4 +12,5 @@ Trendyol/test/utility.py
 Trendyol/test1/__pycache__/Json_class.cpython-37.pyc
 Trendyol/test1/json_scrap.py
 Trendyol/test1/utility.py
-Trendyol/jsonRun.py
+Trendyol/run.py
+Trendyol/TrendyolData.py
