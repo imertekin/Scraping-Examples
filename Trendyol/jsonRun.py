@@ -46,9 +46,9 @@ def add():
         df=pd.DataFrame.from_dict(data.product)
     try:
         df.drop_duplicates(subset=['P_id'],inplace=True)
-        df.to_sql('JsonProduct',engine,if_exists='append',index=False)
+
     except:
-        print('HATA BULUNDU ',i)
+        print('Error',i)
 
 
 add() 
