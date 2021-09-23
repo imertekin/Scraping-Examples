@@ -22,7 +22,7 @@ You don't need any change in Json_class.py. Run JsonRun.py for all word list.İf
 ## Short-term future goals
 
 1-Increasing the number of scrapped e-commerce <br>
-2-Increasing performance (JSON format) <br> :heavy_check_mark:
-3-Increase the optimization of the retrieved data <br> :heavy_check_mark:
+2-Increasing performance (JSON format) :heavy_check_mark: <br> 
+3-Increase the optimization of the retrieved data :heavy_check_mark: <br> 
 4-Conversion to a more modular structure <br>
 
