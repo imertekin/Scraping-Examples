@@ -3,6 +3,8 @@ import requests
 import json
 import pandas as pd
 import datetime
+from slugify import slugify
+
 
 class data_parser:
 
@@ -97,6 +99,8 @@ class data_parser:
         self.data=pd.DataFrame.from_dict(self.product)
         self.data['addedTime']=pd.to_datetime(self.data['addedTime'])
         self.data['ratingScore']=self.data['ratingScore'].round(2)
+        self.data['slug']=pd.Series(slugify(i) for i in self.data['categoryName'])
+       
 
 
 # k=data_parser()

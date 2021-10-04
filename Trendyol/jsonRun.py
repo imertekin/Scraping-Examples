@@ -7,7 +7,7 @@ from Trendyol import Json_class as js
 import pandas as pd
 import time,datetime
 
-
+from slugify import slugify
 
 pgconn=psycopg2.connect(
     host="localhost",
@@ -43,17 +43,15 @@ def add():
     global df
     for i in words:
         data.run(i,3)
-        df=pd.DataFrame.from_dict(data.product)
+        df=data.data
+        
     try:
         df.drop_duplicates(subset=['P_id'],inplace=True)
-
+        
     except:
-        print('Error',i)
+        print('Error ',i)
 
 
 add() 
 
-df
 df.to_sql('JsonProduct',engine,if_exists='append',index=False)
-
-
