@@ -102,7 +102,7 @@ class data_parser:
         self.data['slug']=pd.Series(slugify(i) for i in self.data['categoryName'])
        
 
-
+#git test
 # k=data_parser()
 
 # k.run('tişört')
