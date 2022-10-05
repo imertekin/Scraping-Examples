@@ -1,5 +1,5 @@
 /venv
-
+.env
 Trendyol/product_list.py
 Trendyol/Trendyol_Jupyter/.ipynb_checkpoints/Trendyol-checkpoint.ipynb
 Trendyol/Trendyol_Jupyter/Trendyol.ipynb
@@ -17,5 +17,5 @@ Trendyol/TrendyolData.py
 Trendyol/Trendyol_data.py
 Trendyol/run.py
 slug.csv
-Trendyol/__pycache__/Json_class.cpython-37.pyc
+Trendyol/__pycache__
 slug2.csv

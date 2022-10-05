@@ -39,8 +39,7 @@ class data_parser:
     
             r=requests.get(search_link)
             soup=BeautifulSoup(r.content,'lxml')
-
-        self.data = str(soup.find('script', type='application/javascript'))
+        self.data = str(soup.find_all('script', type='application/javascript')[2])
         self.data=self.data.replace('<script type="application/javascript">window.__SEARCH_APP_INITIAL_STATE__=','')
         self.data=self.data.replace(';window.slpName=\'\';window.TYPageName=\'product_search_result\';window.isSearchResult=true;window.pageType="search";</script>','')
 
@@ -102,7 +101,7 @@ class data_parser:
         self.data['slug']=pd.Series(slugify(i) for i in self.data['categoryName'])
        
 
-#git test
-# k=data_parser()
 
-# k.run('tişört')
+k=data_parser()
+
+k.run('tişört')

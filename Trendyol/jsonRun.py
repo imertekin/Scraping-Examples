@@ -2,29 +2,32 @@ import psycopg2
 from psycopg2 import sql
 from requests.api import request
 from sqlalchemy import create_engine
-
 import requests
+import pandas as pd
+import time,datetime
+from slugify import slugify
+from dotenv import load_dotenv
+import os
 
 from Trendyol import Json_class as js 
 
-import pandas as pd
-import time,datetime
 
-from slugify import slugify
+load_dotenv()
+
 
 pgconn=psycopg2.connect(
-    host="localhost",
-    port="5432",
-    database="trendyol",
-    user="postgres",
-    password="admin"
+    host = os.environ.get("HOST"),
+    port = os.environ.get("PORT"),
+    database = os.environ.get("DATABASE"),
+    user = os.environ.get("USER"),
+    password = os.environ.get("PASSWORD")
 )
 
 pgcursor=pgconn.cursor()
 
 
 
-engine=create_engine('postgresql+psycopg2://postgres:admin@localhost/trendyol')
+engine=create_engine(f'postgresql+psycopg2://{os.environ.get("USER")}:{os.environ.get("PASSWORD")}@localhost/trendyol')
 
 
 
